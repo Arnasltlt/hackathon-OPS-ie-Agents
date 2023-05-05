@@ -45,7 +45,31 @@ def pick_tool(conversation):
         "process_refund": process_refund,
         "update_inventory": update_inventory,
     }
-
+    print("Tool selected: ",tool_name)
     return tools.get(tool_name, None)
     #return interpretation.choices[0].message.content.strip()
+
+def extract_tool_parameters(tool_name, conversation):
+    params_definition = {
+        "generate_price_quote": "item_id and quantity",
+        "schedule_meeting": "client_name, date, and time",
+        "process_refund": "order_id",
+        "update_inventory": "product_id and new_quantity"
+    }
+    params_info = params_definition.get(tool_name, "")
+
+    interpretation = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": f"You are an assistant that extracts relevant parameters from the conversation for the '{tool_name}' tool. "
+                                          f"The required parameters for this tool are: {params_info}. "
+                                          "Please extract the required parameters in a JSON format.No further explanation needed"},
+            {"role": "user", "content": conversation},
+        ],
+        temperature=0.3,
+        max_tokens=100,
+    )
+
+    extracted_params_json = interpretation.choices[0].message.content.strip()
+    return json.loads(extracted_params_json)
 
