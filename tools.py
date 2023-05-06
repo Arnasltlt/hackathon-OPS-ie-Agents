@@ -4,6 +4,7 @@ import os
 
 openai.api_key = os.environ["openai_key"]
 
+
 # Tool function example: Generate a price quote
 def generate_price_quote(item_id, quantity):
     # Add your logic here to generate a price quote based on the item_id and quantity
@@ -36,6 +37,7 @@ def retrieve_tool_and_params_definition(conversation):
                                           "When you identify both the tool and parameter definitions, reply with 'Definitions found: TOOL_NAME, PARAMETERS_DEFINITION'. "
                                           "Otherwise, continue the conversation to gather more information."
                                           " The agent starts the conversation with a notification to the user. Use that to guide the user to make a decission"},
+
             *conversation,
         ],
         temperature=0.3,
