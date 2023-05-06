@@ -10,11 +10,17 @@ function App() {
     const userMessage = { id: messages.length, text: message, role: "user" };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
+    const conversationHistory = messages
+      .concat(userMessage)
+      .map((msg) => `${msg.role === "user" ? "User:" : "Assistant:"} ${msg.text}`)
+      .join("\n");
+
     try {
       const response = await axios.post(
         "http://localhost:5000/api/converse",
         {
           user_input: message,
+          conversation_history: conversationHistory,
         },
         {
           headers: {
