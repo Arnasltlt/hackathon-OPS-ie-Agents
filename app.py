@@ -17,7 +17,7 @@ def converse():
     # conversation_history.append({"role": "user", "content": user_input})
 
     assistant_response = retrieve_tool_and_params_definition(conversation_history)
-    conversation_history.append({"role": "assistant", "content": assistant_response})
+    #conversation_history.append({"role": "assistant", "content": assistant_response})
 
     response = {
         "status": "continue",
@@ -41,3 +41,6 @@ def converse():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+extract_tool_parameters

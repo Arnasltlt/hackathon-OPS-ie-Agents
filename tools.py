@@ -124,9 +124,10 @@ def extract_tool_parameters(tool_name, conversation_history):
     interpretation = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": f"You are an assistant that extracts relevant parameters from the conversation for the '{tool_name}' tool. "
+            {"role": "system", "content": f"""You are an assistant that extracts relevant parameters from the conversation for the '{tool_name}' tool. "
                                           f"The required parameters for this tool are: {params_info}. "
-                                          """Please extract the required parameters in a JSON format just like this: {"item_id": '213', "quantity": '44'} .No further explanation needed"""""},
+                                          " Please extract the required parameters in a JSON format just like this: {{\"item_id\": '213', \"quantity\": '44'}} .No further explanation needed"
+                                          " bad response example: \"{{'email_content': 'We are sorry for the inconvenience caused}}\". good example: {{'We are sorry for the inconvenience caused'}}."""},
 
             *conversation_history,
             {"role": "system",
@@ -144,6 +145,7 @@ def extract_tool_parameters(tool_name, conversation_history):
         extracted_params = None
 
     return extracted_params
+
 
 
 def send_email(instructions):
