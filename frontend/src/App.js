@@ -1,39 +1,44 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
+import MessageForm from "./components/MessageForm";
+import MessageList from "./components/MessageList";
 
 function App() {
-  const [userInput, setUserInput] = useState('');
+  const [messages, setMessages] = useState([]);
 
-  const handleUserInputChange = (event) => {
-    setUserInput(event.target.value);
-  };
+  const handleSendMessage = async (message) => {
+    const userMessage = { id: messages.length, text: message, role: "user" };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
 
-  const handleClick = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/converse', {
-        user_input: userInput,
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
+      const response = await axios.post(
+        "http://localhost:5000/api/converse",
+        {
+          user_input: message,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
 
-      console.log(response.data);
+      const assistantMessage = {
+        id: messages.length + 1,
+        text: response.data.assistant_response,
+        role: "assistant",
+      };
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
   return (
     <div className="App">
       <h1>Assistant</h1>
-      <input
-        type="text"
-        value={userInput}
-        onChange={handleUserInputChange}
-        placeholder="Type your message here..."
-      />
-      <button onClick={handleClick}>Send</button>
+      <MessageList messages={messages} />
+      <MessageForm onSubmit={handleSendMessage} />
     </div>
   );
 }
