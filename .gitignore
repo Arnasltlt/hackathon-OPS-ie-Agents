@@ -1,0 +1,31 @@
+# Virtual environment
+venv/
+gptapi/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+
+# Log files
+*.log
+
+# Other files and folders typically excluded
+*.swp
+*.swo
+.DS_Store
+.vscode/
+.idea/
+*.egg-info/
+dist/
+build/
+*.egg
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.env
