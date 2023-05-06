@@ -14,7 +14,9 @@ conversation_history = [
 
 found_definitions = False
 
+print(conversation_history[0]['content'])
 while not found_definitions:
+
     user_input = input("User: ")
     conversation_history.append({"role": "user", "content": user_input})
 

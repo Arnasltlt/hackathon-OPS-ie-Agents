@@ -2,8 +2,6 @@ import openai
 import json
 import os
 
-openai.api_key = os.environ["openai_key"]
-
 
 # Tool function example: Generate a price quote
 def generate_price_quote(item_id, quantity):
