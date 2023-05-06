@@ -24,7 +24,20 @@ def converse():
         "assistant_response": assistant_response
     }
     response = jsonify(response)
-    return response
+    if assistant_response.startswith("Definitions found:"):
+
+        tool = pick_tool(conversation_history)
+
+        if tool:
+            tool_params = extract_tool_parameters(tool.__name__, conversation_history)
+            print("Extracted parameters:", tool_params)
+
+            # Call the tool function with the extracted parameters
+            result = tool(**tool_params)
+            print("Result:", result)
+        return result
+    else:
+        return response
 
 if __name__ == '__main__':
     app.run(debug=True)
