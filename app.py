@@ -11,10 +11,10 @@ openai.api_key = os.environ["openai_key"]
 
 @app.route('/api/converse', methods=['POST'])
 def converse():
-    user_input = request.json['user_input']
+    # user_input = request.json['user_input']
     conversation_history = request.json['conversation_history']
 
-    conversation_history.append({"role": "user", "content": user_input})
+    # conversation_history.append({"role": "user", "content": user_input})
 
     assistant_response = retrieve_tool_and_params_definition(conversation_history)
     conversation_history.append({"role": "assistant", "content": assistant_response})

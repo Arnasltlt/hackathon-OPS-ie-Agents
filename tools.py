@@ -60,12 +60,12 @@ def retrieve_tool_and_params_definition(conversation_history):
         model="gpt-4",
         messages=[
             {"role": "system", "content": "You are an assistant that helps retrieve tool and parameter definitions from the conversation. "
-                                          "You have the following tools available: 'generate_price_quote', 'schedule_meeting', 'process_refund', 'update_inventory'. "
+                                          "You have the following tools available: 'get_conversations', 'schedule_meeting', 'process_refund', 'send_email'. "
                                           "The required parameters for each tool are: "
-                                          "'generate_price_quote' needs 'item_id and quantity', "
+                                          "'get_conversations' needs 'ticket_id and instructions on what to find', "
                                           "'schedule_meeting' needs 'client_name, date, and time', "
                                           "'process_refund' needs 'order_id', "
-                                          "and 'update_inventory' needs 'product_id and new_quantity'. "
+                                          "and 'send email' needs 'content of the email'. "
                                           "When you identify both the tool and parameter definitions, reply with 'Definitions found: TOOL_NAME, PARAMETERS_DEFINITION'. "
                                           "Otherwise, continue the conversation to gather more information."
                                           " The agent starts the conversation with a notification to the user. Use that to guide the user to make a decission"},
@@ -87,7 +87,7 @@ def pick_tool(conversation_history):
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a tool picker that identifies the appropriate action based on the user's conversation_history. "
-                                          "As your final answer you only can choose from the following words: 'generate_price_quote', 'schedule_meeting', 'process_refund', 'update_inventory'. "
+                                          "As your final answer you only can choose from the following words: 'get_conversations', 'schedule_meeting', 'process_refund', 'send_email'. "
                                           "return the exact name of the tool. Mention only the word - no further explanations needed."},
             *conversation_history,
             {"role": "system",
