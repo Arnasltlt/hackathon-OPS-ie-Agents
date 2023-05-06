@@ -21,7 +21,7 @@ def process_refund(order_id):
 def update_inventory(product_id, new_quantity):
     return f"Inventory updated for product {product_id}. New quantity: {new_quantity}."
 
-def retrieve_tool_and_params_definition(conversation):
+def retrieve_tool_and_params_definition(conversation_history):
     interpretation = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
@@ -36,7 +36,7 @@ def retrieve_tool_and_params_definition(conversation):
                                           "Otherwise, continue the conversation to gather more information."
                                           " The agent starts the conversation with a notification to the user. Use that to guide the user to make a decission"},
 
-            *conversation,
+            *conversation_history,
         ],
         temperature=0.3,
         max_tokens=100,
@@ -48,14 +48,14 @@ def retrieve_tool_and_params_definition(conversation):
 
 
 # Tool picking function using OpenAI
-def pick_tool(conversation):
+def pick_tool(conversation_history):
     interpretation = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a tool picker that identifies the appropriate action based on the user's conversation. "
+            {"role": "system", "content": "You are a tool picker that identifies the appropriate action based on the user's conversation_history. "
                                           "As your final answer you only can choose from the following words: 'generate_price_quote', 'schedule_meeting', 'process_refund', 'update_inventory'. "
                                           "return the exact name of the tool. Mention only the word - no further explanations needed."},
-            *conversation,
+            *conversation_history,
             {"role": "system",
              "content": "Here's the tool you've chosen:"},
         ],
@@ -76,7 +76,7 @@ def pick_tool(conversation):
     return tools.get(tool_name, None)
     #return interpretation.choices[0].message.content.strip()
 
-def extract_tool_parameters(tool_name, conversation):
+def extract_tool_parameters(tool_name, conversation_history):
     params_definition = {
         "generate_price_quote": "item_id and quantity",
         "schedule_meeting": "client_name, date, and time",
@@ -92,7 +92,7 @@ def extract_tool_parameters(tool_name, conversation):
                                           f"The required parameters for this tool are: {params_info}. "
                                           """Please extract the required parameters in a JSON format just like this: {"item_id": '213', "quantity": '44'} .No further explanation needed"""""},
 
-            *conversation,
+            *conversation_history,
             {"role": "system",
              "content": "The final answer:"},
         ],
