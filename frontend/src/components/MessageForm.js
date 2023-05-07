@@ -15,12 +15,15 @@ function MessageForm(props) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Message:
-        <input type="text" value={message} onChange={handleChange} />
-      </label>
-      <button type="submit">Send</button>
+    <form onSubmit={handleSubmit} className="mt-auto p-4 bg-gray-100">
+      <div className="flex items-center space-x-4">
+        <label className="m-5">
+          <input type="text" value={message} onChange={handleChange} className="w-full px-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300" placeholder="Type your message here..." />
+        </label>
+        <button type="submit" className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg">
+          Send
+        </button>
+      </div>
     </form>
   );
 }
