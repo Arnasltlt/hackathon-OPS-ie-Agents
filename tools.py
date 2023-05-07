@@ -19,7 +19,7 @@ def plain_gpt(instructions,input):
 
     return interpretation.choices[0].message.content
 
-def get_conversations(ticket_id,summary_instructions):
+def get_conversations(ticket_id,instructions):
     url = f"https://3dhubs.freshdesk.com/api/v2/tickets/{ticket_id}/conversations"
     headers = {
         "Content-Type": "application/json",
@@ -32,8 +32,26 @@ def get_conversations(ticket_id,summary_instructions):
     if response.status_code == 200:
         text = response.json()[0]['body_text']
         print(text)
-        summary = plain_gpt(f'Summarise this text for me. ---{summary_instructions} ---',text)
+        summary = plain_gpt(f'Summarise this text for me. ---{instructions} ---',text)
         return summary
+
+
+def send_email(content):
+    url = "https://nla.zapier.com/api/v1/exposed/01GZS5GHDWRKMCPCN9ZA6DJVV0/execute/"
+
+    headers = {
+        "Content-Type": "application/json",
+        "x-api-key": zap_auth,
+    }
+
+    data = {
+        "instructions": f"send an email using the following instructions: {content} ",
+    }
+
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+
+    print(response.text)
+
 
 # Tool function example: Generate a price quote
 def generate_price_quote(item_id, quantity):
@@ -65,10 +83,12 @@ def retrieve_tool_and_params_definition(conversation_history):
                                           "'get_conversations' needs 'ticket_id and instructions on what to find', "
                                           "'schedule_meeting' needs 'client_name, date, and time', "
                                           "'process_refund' needs 'order_id', "
-                                          "and 'send email' needs 'content of the email'. "
-                                          "When you identify both the tool and parameter definitions, reply with 'Definitions found: TOOL_NAME, PARAMETERS_DEFINITION'. "
+                                          "and 'send email' needs 'content'. "
+                                          "When you identify both the tool and parameter definitions, reply with "
+                                          "'Definitions found: TOOL_NAME, PARAMETERS_DEFINITION' - when the definitions are found the response has to start with this. "
                                           "Otherwise, continue the conversation to gather more information."
-                                          " The agent starts the conversation with a notification to the user. Use that to guide the user to make a decission"},
+                                          " The agent starts the conversation with a notification to the user. Use that to guide the user to make a decission"
+                                          "When the conversation ends send the final message beggining with CONVERSATION OVER"},
 
             *conversation_history,
         ],
@@ -122,22 +142,25 @@ def extract_tool_parameters(tool_name, conversation_history):
     params_info = params_definition.get(tool_name, "")
 
     interpretation = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
-            {"role": "system", "content": f"""You are an assistant that extracts relevant parameters from the conversation for the '{tool_name}' tool. "
-                                          f"The required parameters for this tool are: {params_info}. "
-                                          " Please extract the required parameters in a JSON format just like this: {{\"item_id\": '213', \"quantity\": '44'}} .No further explanation needed"
-                                          " bad response example: \"{{'email_content': 'We are sorry for the inconvenience caused}}\". good example: {{'We are sorry for the inconvenience caused'}}."""},
-
-            *conversation_history,
             {"role": "system",
+             "content": f"You are an AI assistant that is designed to extract relevant parameters from conversations for the '{tool_name}' tool. "
+                        "Your task is to identify and output the required parameters (only values) as a dictionary mapping."
+                        'Correct example: "We are sorry for the inconvenience caused.'
+                        'bad example: {\'email_content\': \'say its going to be okay\'}send.'
+                        'good example : {\"content\":\"its going to be okay\"} '
+                        f"Here are the required parameters for various tools: {params_info}."},
+            *conversation_history,
+            {"role": "assistant",
              "content": "The final answer:"},
         ],
         temperature=0.3,
-        max_tokens=100,
+        max_tokens=200,
     )
     print(interpretation.choices[0].message.content)
     extracted_params_json = interpretation.choices[0].message.content
+
     try:
         extracted_params = json.loads(extracted_params_json)
     except json.JSONDecodeError:
@@ -148,18 +171,3 @@ def extract_tool_parameters(tool_name, conversation_history):
 
 
 
-def send_email(instructions):
-    url = "https://nla.zapier.com/api/v1/exposed/01GZS5GHDWRKMCPCN9ZA6DJVV0/execute/"
-
-    headers = {
-        "Content-Type": "application/json",
-        "x-api-key": zap_auth,
-    }
-
-    data = {
-        "instructions": f"send an email using the following instructions: {instructions} ",
-    }
-
-    response = requests.post(url, headers=headers, data=json.dumps(data))
-
-    print(response.text)
