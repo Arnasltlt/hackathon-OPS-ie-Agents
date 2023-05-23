@@ -1,4 +1,4 @@
-# hackathon-oopsie
+# hackathon-OPSie
  
 The future of OPS notifications.
 
